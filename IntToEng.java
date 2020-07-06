@@ -1,63 +1,106 @@
 import java.util.Scanner;
 
 public class IntToEng {
-    // ƒƒCƒ“ƒƒ\ƒbƒh
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+	// ãƒ¡ã‚¤ãƒ³ãƒ¡ã‚½ãƒƒãƒ‰
+	public static void main(String[] args) {
+		System.out.println("put number (-2,147,483,647 ~ 2,147,483,647)");
+		Scanner sc = new Scanner(System.in);
+		for(;;) {
+			int input = sc.nextInt();
+			System.out.println(translateEng(input));
+		}
+	}
 
-        for(;;) {
-            int input = sc.nextInt();
-            if(input<0) break; //0ˆÈ‰º‚Ì”‚ª“ü—Í‚³‚ê‚½‚È‚çbreak
+	// æ•°å€¤ã‚’è‹±è¨³ã™ã‚‹å¤‰æ›ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
+	static String translateEng(int n) {
+		if(n==0)  return "zero"; //nãŒ0ã®å ´åˆ return 
 
-            System.out.println(translateEng(input));
-        }
-    }
+		String s=""; //returnç”¨
+		
+		//0ä»¥ä¸‹ã®æ•°
+		if(n<0) {
+			s+="minus ";
+			n=Math.abs(n);
+		}
+		
+		//1,000,000,000 
+		if(n/1000000000 >0) s+=hundTenOne(n/1000000000)+"billion ";
 
-    // ”’l‚ğ‰p–ó‚·‚é•ÏŠ·‚·‚éƒƒ\ƒbƒh (0~999)
-    static String translateEng(int n) {
-        String s=""; //return—p‚Ì•¶š
+		//1,000,000
+		if((n%1000000000)/1000000 >0) {
+			if(n/1000000000 >0) s+="and ";
+		s+=hundTenOne((n%1000000000)/1000000)+"million ";
+		}
 
-        String[] one= {"","one ","two ","three ","four ","five ","six ","seven ","eight ","nine "}; //1
-        String[] teen= {"ten","eleven","twelve"};//10,11,12(“Áê)
-        String[] ten= {"","","twen","thir","four","fif","six","seven","eigh","nine"};//10
-        
-        // Œ…”
-        int digits = 0;
-        int temp = n;
-        while(temp > 0) {
-            temp /= 10;
-            digits++;
-        }
-         
-        // intŒ^‚Ì”z—ñ‚É“ü‚ê‚é
-        // numbers[0]‚É1‚ÌˆÊ, numbers[1]‚É10‚ÌˆÊ, numbers[2]‚É100‚ÌˆÊ...
-        int[] numbers = new int[digits];
-        for (int i = 0; i < digits; i++) {
-            numbers[digits - i - 1] = (int) ((n % Math.pow(10, digits - i)) / Math.pow(10, digits - i -1));
-        } 
-        
-        //n‚ª0‚Ìê‡ return
-        if(n==0)  return "zero"; 
-        
-        //1000‚ÌˆÊ && 1000‚ÌˆÊ‚ª0‚ğœ‚­
-        if(digits >= 4 && numbers[3] != 0) s+=one[numbers[3]] +"thousand ";
+		//1000
+		if((n%1000000)/1000 >0) {
+			if(n/1000000 >0) s+="and ";
+			s+=hundTenOne((n%1000000)/1000)+"thousand ";
+		}
 
-        //100‚ÌˆÊ && 100‚ÌˆÊ‚ª0‚ğœ‚­
-        if(digits >= 3 && numbers[2] != 0) s+=one[numbers[2]] +"hundred ";
+		//1000æœªæº€
+		if(n%1000>0) {
+			if(n/1000>0) s+="and ";
+			s+=hundTenOne(n%1000);
+		}
+		
+		return s;
+	}
 
-        //10‚ÌˆÊ && 10‚ÌˆÊ‚ª0‚ğœ‚­
-        if(digits >= 2 && numbers[1] != 0) {
-            if(numbers[1] == 1) {   //10~19‚Ìê‡
-                if(numbers[0] <3) s+=  teen[numbers[0]]; //10~12‚Ìê‡
-                else  s += ten[numbers[1]]+"teen"; //13~19‚Ìê‡
-                return s;
-            }
-            else s+= ten[numbers[1]]+"ty " ; //20~90‚Ìê‡‚Í10‚ÌˆÊ‚Ü‚Å‚ğİ’è
-        }
+	//(è¿½åŠ )ã€€100,10ã€1ã®ä½ã‚’è¨­å®šã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
+	static String hundTenOne(int n) {
+		String s="";//returnç”¨ã®æ–‡å­—
 
-        //1‚ÌˆÊ
-        s+=one[numbers[0]];
+		String[] one= {"","one ","two ","three ","four ","five ","six ","seven ","eight ","nine "}; //1
+		String[] teen= {"ten ","eleven ","twelve "};//10,11,12(ç‰¹æ®Šãªæ•°ãˆæ–¹)
+		String[] ten= {"","","twen","thir","four","fif","six","seven","eigh","nine"};//10
+		
+		//100ã®ä½
+		if(n/100 >0) s+=one[n/100] +"hundred ";
+		
+		//10ã®ä½
+		if((n%100)/10 >0) {
+			if(10<= n%100  && n%100< 20) {   //10~19ã®å ´åˆ
+				if(n%10 <3) s+=  teen[n%10]; //10~12ã®å ´åˆ
+				else  s+= ten[(n%100)%10 ]+"teen "; //13~19ã®å ´åˆ
+				
+				return s;
+			}
+			else s+= ten[(n%100)/10 ]+"ty " ; //20~90ã®å ´åˆã¯10ã®ä½ã¾ã§ã‚’è¨­å®š
+		}
+		
+		//ï¼‘ã®ä½
+		s+=one[n%10];
 
-        return s;
-    }
+		return s;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
